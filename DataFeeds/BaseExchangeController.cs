@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TurboBuba.DataFeeds
 {
-    public class BaseExchangeController
+    public abstract class BaseExchangeController
     {
         private readonly ExchangesList _exchange = ExchangesList.None;
 
@@ -14,6 +14,10 @@ namespace TurboBuba.DataFeeds
         {
             _exchange = exchange;
         }
+
+        #region Abstract methods
+        public abstract void SubscribeOrderBook(string contract, int depth);
+        #endregion
 
         public ContractInfo RegisterContract(string contract, int priceScale, int multiplier)
         {
@@ -37,5 +41,7 @@ namespace TurboBuba.DataFeeds
             }
             return null;
         }
+
+        
     }
 }
