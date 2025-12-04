@@ -17,14 +17,13 @@ namespace TurboBuba.DataFeeds
         {
             this.ConnectionStatusChanged(ExchangeConnectionStatus.Connecting);
             _socketClient = new BinanceSocketClient();
-            await _socketClient.UsdFuturesApi.PrepareConnectionsAsync();
-
+            await _socketClient.UsdFuturesApi.PrepareConnectionsAsync();            
             this.ConnectionStatusChanged(ExchangeConnectionStatus.Connected);
         }
 
         public override void SubscribeOrderBook(string contract, int depth)
         {
-            throw new NotImplementedException();
+            
         }
 
 
