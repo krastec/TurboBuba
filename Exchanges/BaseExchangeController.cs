@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using TurboBuba.Infrastructure;
 
-namespace TurboBuba.DataFeeds
+namespace TurboBuba.Exchanges
 {
     public enum ExchangeConnectionStatus
     {
@@ -16,20 +16,21 @@ namespace TurboBuba.DataFeeds
 
     public abstract class BaseExchangeController
     {
-        private readonly Exchanges _exchange = Exchanges.None;
+        private readonly ExchangesList _exchange = ExchangesList.None;
 
         private Dictionary<string, ContractInfo> _contracts = new();
+        protected ExchangeSubscriptionManager _subscriptionManager  = new();
 
         public bool IsConnected { get; protected set; } = false;
 
-        public BaseExchangeController(Exchanges exchange)
+        public BaseExchangeController(ExchangesList exchange)
         {
             _exchange = exchange;
         }
 
         #region Abstract methods
         public abstract void Connect();
-        public abstract void SubscribeOrderBook(string contract, int depth);
+        public abstract void SubscribeOrderBook(string contract, int depth, IExchangeSubscriptionConsumer consumer);
         #endregion
 
         #region Events
@@ -41,13 +42,14 @@ namespace TurboBuba.DataFeeds
         }
         #endregion
 
-        public ContractInfo RegisterContract(string contract, int priceScale, int multiplier)
+        #region Contract management
+        public ContractInfo RegisterContract(string contract, ContractType type, int priceScale, int multiplier)
         {
             {
                 var upperContract = contract.ToUpperInvariant();
                 if (!_contracts.ContainsKey(contract))
                 {
-                    _contracts.Add(contract, new ContractInfo(contract, priceScale, multiplier));
+                    _contracts.Add(contract, new ContractInfo(contract, type, priceScale, multiplier));
                 }
 
                 return _contracts[contract];
@@ -63,7 +65,7 @@ namespace TurboBuba.DataFeeds
             }
             return null;
         }
+        #endregion
 
-        
     }
 }

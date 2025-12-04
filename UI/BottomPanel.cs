@@ -8,7 +8,7 @@ using Terminal.Gui.App;
 using Terminal.Gui.Drawing;
 using Terminal.Gui.Input;
 using Terminal.Gui.ViewBase;
-using TurboBuba.DataFeeds;
+using TurboBuba.Exchanges;
 
 namespace TurboBuba.UI
 {
@@ -37,7 +37,7 @@ namespace TurboBuba.UI
 
         public void UpdateExchangeStatusItems()
         {            
-            ExchangeStatusItem exchangeStatusItem = new ExchangeStatusItem(Exchanges.Binance);
+            ExchangeStatusItem exchangeStatusItem = new ExchangeStatusItem(ExchangesList.Binance);
             exchangeStatusItem.X = 0;
             exchangeStatusItem.Y = 0;
             this.Add(exchangeStatusItem);

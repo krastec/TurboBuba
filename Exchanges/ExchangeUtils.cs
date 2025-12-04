@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TurboBuba.DataFeeds
+namespace TurboBuba.Exchanges
 {
     public class ExchangeUtils
     {
-        public static string GetExchangeName(Exchanges exchange)
+        public static string GetExchangeName(ExchangesList exchange)
         {
             return exchange switch
             {
-                Exchanges.None => "None",
-                Exchanges.Binance => "Binance",
+                ExchangesList.None => "None",
+                ExchangesList.Binance => "Binance",
                 _ => "Unknown"
             };
         }

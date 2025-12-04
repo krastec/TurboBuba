@@ -33,6 +33,11 @@ namespace TurboBuba.UI
             window.Add(label);
             window.Add(bottomPanel);
 
+            OrderBook orderBook = new();
+            orderBook.Width = Dim.Percent(50);
+            orderBook.Height = Dim.Fill() - 1;
+            window.Add(orderBook);
+
             app.Run(window);
         }
     }

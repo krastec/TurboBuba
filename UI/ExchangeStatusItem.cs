@@ -6,8 +6,8 @@ using Terminal.Gui.Drawing;
 using Terminal.Gui.Input;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
-using TurboBuba.DataFeeds;
 using TurboBuba.Events;
+using TurboBuba.Exchanges;
 using TurboBuba.Infrastructure;
 
 namespace TurboBuba.UI
@@ -17,14 +17,14 @@ namespace TurboBuba.UI
         private int _pingIn = 0; //пинг на получение данных
         private int _pingOut = 0; //пинг на отправку, например, на постановку ордеров
         private ExchangeConnectionStatus _connectionStatus = ExchangeConnectionStatus.Unknown;
-        private readonly Exchanges _exchangeId = Exchanges.None;
+        private readonly ExchangesList _exchangeId = ExchangesList.None;
         private EventSubscriber _subscriber = null!;
 
         private string _exchangeName = String.Empty;
 
         private Label _mainLabel = null!;
         
-        public ExchangeStatusItem(Exchanges exchandeId)        
+        public ExchangeStatusItem(ExchangesList exchandeId)        
         {
             _exchangeId = exchandeId;
 

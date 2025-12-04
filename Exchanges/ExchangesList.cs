@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TurboBuba.DataFeeds
+namespace TurboBuba.Exchanges
 {
-    public enum Exchanges
+    public enum ExchangesList
     {
         None = 0,
         Binance = 1,        

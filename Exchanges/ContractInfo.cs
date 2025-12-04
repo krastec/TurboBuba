@@ -2,17 +2,25 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TurboBuba.DataFeeds
+namespace TurboBuba.Exchanges
 {
+    public enum ContractType
+    {
+        Spot,
+        Perp
+    }
+
     public class ContractInfo
     {
         public string Contract { get;  } = string.Empty;
+        public ContractType ContractType { get; } = ContractType.Perp;
         public int PriceScale { get;  } = 0;
         public int Multiplier { get; } = 1;
 
-        public ContractInfo(string contract, int priceScale, int multiplier)
+        public ContractInfo(string contract, ContractType contractType, int priceScale, int multiplier)
         {
             Contract = contract;
+            ContractType = contractType;
             PriceScale = priceScale;
             Multiplier = multiplier;
         }

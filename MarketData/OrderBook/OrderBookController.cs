@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TurboBuba.OrderBook
+namespace TurboBuba.MarketData.OrderBook
 {
 
     public class OrderBookController

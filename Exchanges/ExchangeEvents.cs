@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using TurboBuba.Events;
 
-namespace TurboBuba.DataFeeds
+namespace TurboBuba.Exchanges
 {
     public class ExchangeEvents
     {

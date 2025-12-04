@@ -14,6 +14,8 @@
 
   <ItemGroup>
     <Folder Include="Logger\" />
+    <Folder Include="CommandCenter\" />
+    <Folder Include="Strategies\" />
   </ItemGroup>
 
 </Project>

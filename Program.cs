@@ -6,7 +6,7 @@ using Terminal.Gui;
 using TurboBuba.UI;
 using TurboBuba.Events;
 using TurboBuba.Infrastructure;
-using TurboBuba.DataFeeds;
+using TurboBuba.Exchanges;
 
 
 

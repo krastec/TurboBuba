@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
+
 
 namespace TurboBuba.Infrastructure
 {
@@ -9,7 +7,21 @@ namespace TurboBuba.Infrastructure
     {
         public static void Log(string message)
         {
-            Debug.WriteLine($"[{DateTime.UtcNow:HH:mm:ss.fff}] {message}");
+            Console.WriteLine($"[{DateTime.UtcNow:HH:mm:ss.fff}] {message}");
+        }
+
+        public static void Debug(string message)
+        {
+            Console.WriteLine($"[{DateTime.UtcNow:HH:mm:ss.fff}] DEBUG: {message}");
+        }
+
+        public static void Warn(string message)
+        {
+            Console.WriteLine($"[{DateTime.UtcNow:HH:mm:ss.fff}] WARNING: {message}");
+        }
+        public static void Error(string message)
+        {
+            Console.WriteLine($"[{DateTime.UtcNow:HH:mm:ss.fff}] ERROR: {message}");
         }
     }
 }
