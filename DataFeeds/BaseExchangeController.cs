@@ -1,22 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TurboBuba.Infrastructure;
 
 namespace TurboBuba.DataFeeds
 {
+    public enum ExchangeConnectionStatus
+    {
+        Unknown = 0,
+        Connected = 1,
+        Disconnected = 2,
+        Connecting = 3
+    }
+    
+
     public abstract class BaseExchangeController
     {
-        private readonly ExchangesList _exchange = ExchangesList.None;
+        private readonly Exchanges _exchange = Exchanges.None;
 
         private Dictionary<string, ContractInfo> _contracts = new();
 
-        public BaseExchangeController(ExchangesList exchange)
+        public bool IsConnected { get; protected set; } = false;
+
+        public BaseExchangeController(Exchanges exchange)
         {
             _exchange = exchange;
         }
 
         #region Abstract methods
+        public abstract void Connect();
         public abstract void SubscribeOrderBook(string contract, int depth);
+        #endregion
+
+        #region Events
+        protected void ConnectionStatusChanged(ExchangeConnectionStatus status)
+        {
+            AppController.Instance.EventBus.Publish(new ExchangeEvents.ConnectionStatusChanged(this, status));
+
+            Logger.Log($"[{_exchange}] Connection status changed to {status}");
+        }
         #endregion
 
         public ContractInfo RegisterContract(string contract, int priceScale, int multiplier)

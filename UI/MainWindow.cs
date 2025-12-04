@@ -9,6 +9,13 @@ namespace TurboBuba.UI
 {
     internal class MainWindow
     {
+        private readonly IServiceProvider _serviceProvider;
+
+        public MainWindow(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;            
+        }
+
         public void Show()
         {
             using IApplication app = Application.Create();
@@ -21,7 +28,10 @@ namespace TurboBuba.UI
                 X = Pos.Center(),
                 Y = Pos.Center()
             };
+
+            BottomPanel bottomPanel = new();
             window.Add(label);
+            window.Add(bottomPanel);
 
             app.Run(window);
         }

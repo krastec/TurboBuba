@@ -12,4 +12,8 @@
     <PackageReference Include="Terminal.Gui" Version="2.0.0-develop.4653" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Logger\" />
+  </ItemGroup>
+
 </Project>

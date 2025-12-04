@@ -4,10 +4,9 @@ using System.Text;
 
 namespace TurboBuba.DataFeeds
 {
-    public enum ExchangesList
+    public enum Exchanges
     {
         None = 0,
-        Binance = 1,
-        
+        Binance = 1,        
     }
 }
