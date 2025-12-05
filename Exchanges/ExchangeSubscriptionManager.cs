@@ -9,9 +9,9 @@ namespace TurboBuba.Exchanges
     {
         private Dictionary<string, ExchangeSubscription> _subscriptions = new Dictionary<string, ExchangeSubscription>();
 
-        public static string GetSubscriptionKey(string contract, ContractType contractType, ExchangeSubscription.SubscriptionType subscriptionType) 
+        public static string GetSubscriptionKey(ContractInfo contractInfo, ExchangeSubscription.SubscriptionType subscriptionType) 
         {
-            string keySuffix = contractType == ContractType.Spot ? "SPOT" : "PERP";
+            string keySuffix = ExchangeUtils.GetSuffixByContractType(contractInfo.ContractType);
 
             if (subscriptionType == ExchangeSubscription.SubscriptionType.None)
             {
@@ -19,10 +19,10 @@ namespace TurboBuba.Exchanges
             }
             else if(subscriptionType == ExchangeSubscription.SubscriptionType.OrderBook)
             {
-                return $"OB_{contract.ToUpper()}_${keySuffix}";
-            }            
-            
-            throw new ArgumentOutOfRangeException(nameof(subscriptionType), "Unknown subscription type");            
+                return $"OB_{contractInfo.Contract.ToUpper()}_${keySuffix}";
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(subscriptionType), "Unknown subscription type");
         }
 
         public bool HasSubscription(string key)
@@ -30,14 +30,14 @@ namespace TurboBuba.Exchanges
             return _subscriptions.ContainsKey(key);
         }
 
-        public ExchangeSubscription AddSubscription(string key, ExchangeSubscription.SubscriptionType type, ContractType contractType, string contract, string topic, IExchangeSubscriptionConsumer consumer, Dictionary<string, string> extraData)
+        public ExchangeSubscription AddSubscription(string key, ExchangeSubscription.SubscriptionType type, ContractInfo contractInfo, string topic, IExchangeSubscriptionConsumer consumer, Dictionary<string, string> extraData)
         {
             if (_subscriptions.ContainsKey(key))
             {
                 Logger.Debug($"Subscription with key '{key}' already exists.");
                 return _subscriptions[key];
             }
-            var subscription = new ExchangeSubscription(key, type, contract, contractType, topic, consumer, extraData);
+            var subscription = new ExchangeSubscription(key, type, contractInfo, topic, consumer, extraData);
             _subscriptions[key] = subscription;
             return subscription;
         }

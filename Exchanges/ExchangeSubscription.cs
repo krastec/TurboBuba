@@ -18,21 +18,20 @@ namespace TurboBuba.Exchanges
 
 
         public string Key { get; } = String.Empty;
-        public SubscriptionType Type { get; } = SubscriptionType.None;
-        public ContractType ContractType { get; } = ContractType.Perp;
-        public string Contract { get; } = String.Empty; 
+        public SubscriptionType Type { get; } = SubscriptionType.None;        
+        public ContractInfo ContractInfo { get; } = null!;
         public string Topic { get; } = String.Empty;
         public List<IExchangeSubscriptionConsumer> Consumers { get; private set; }
         public Dictionary<string, string> ExtraData { get; } = [];
-        public CancellationToken CancelationToken { get; set; } = default;
+        public int SubscriptionId { get; set; } = -1;
+        //public CancellationToken CancelationToken { get; set; } = default;
 
-        public ExchangeSubscription(string key, SubscriptionType type, string contract, ContractType contractType, string topic, IExchangeSubscriptionConsumer consumer, Dictionary<string, string> extraData)
+        public ExchangeSubscription(string key, SubscriptionType type, ContractInfo contractInfo, string topic, IExchangeSubscriptionConsumer consumer, Dictionary<string, string> extraData)
         {
             Key = key;
             Type = type;
-            Contract = contract;
-            ContractType = contractType;
-            Topic = topic;
+            ContractInfo = contractInfo;
+            Topic = topic;            
             Consumers = new List<IExchangeSubscriptionConsumer> { consumer };
             ExtraData = extraData;
         }

@@ -38,6 +38,28 @@ namespace TurboBuba.UI
             orderBook.Height = Dim.Fill() - 1;
             window.Add(orderBook);
 
+            /*
+            // Key handler: Ctrl+Shift+H toggles visibility
+            window.KeyDown += (s, args) =>
+            {                
+                // Check Ctrl+Shift+H
+                var isCtrl = args.IsCtrl;
+                var isShift = args.IsShift;
+                var baseKey = args.KeyCode & Terminal.Gui.Drivers.KeyCode.CharMask;
+
+                // Compare to 'H' (uppercase)
+                var isH = baseKey == Terminal.Gui.Drivers.KeyCode.H;
+                Console.WriteLine($"KeyDown: Ctrl={isCtrl}, Shift={isShift}, KeyCode={args.KeyCode}, IsH={isH}");
+                if (isCtrl && isShift && isH)
+                {
+                    window.Visible = !window.Visible;
+                    // Avoid redraw when hidden
+                    //window.SetNeedsDisplay(window.Visible);
+                    args.Handled = true;
+                }
+            };
+            */
+
             app.Run(window);
         }
     }

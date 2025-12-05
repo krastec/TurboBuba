@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Binance.Net" Version="11.11.0" />
-    <PackageReference Include="Terminal.Gui" Version="2.0.0-develop.4653" />
+    <PackageReference Include="Terminal.Gui" Version="2.0.0-develop.4713" />
   </ItemGroup>
 
   <ItemGroup>

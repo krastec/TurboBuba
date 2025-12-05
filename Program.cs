@@ -34,7 +34,10 @@ namespace TurboBuba
             {
                 await Task.Delay(1000); // Simulate some startup delay
                 var binanceController = new BinanceController();
-                binanceController.Connect();
+                await binanceController.Connect();
+
+                binanceController.RegisterContract("BTCUSDT", ContractType.Perp, 100, 1);
+                binanceController.SubscribeOrderBook("BTCUSDT", 10, null);
 
             });
 

@@ -15,5 +15,15 @@ namespace TurboBuba.Exchanges
                 _ => "Unknown"
             };
         }
+
+        public static string GetSuffixByContractType(ContractType contractType)
+        {
+            return contractType switch
+            {
+                ContractType.Perp => "PERP",
+                ContractType.Spot => "SPOT",
+                _ => "UNKNOWN"
+            };
+        }
     }
 }

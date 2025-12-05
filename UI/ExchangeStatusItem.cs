@@ -36,15 +36,8 @@ namespace TurboBuba.UI
         }
 
         private void Render()
-        {
-            SetScheme(new Scheme()
-            {
-                Normal = new Terminal.Gui.Drawing.Attribute(StandardColor.White, StandardColor.DimGray),
-                Focus = new Terminal.Gui.Drawing.Attribute(StandardColor.Black, StandardColor.LightGray),
-                HotNormal = new Terminal.Gui.Drawing.Attribute(StandardColor.Yellow, StandardColor.DimGray),
-                HotFocus = new Terminal.Gui.Drawing.Attribute(StandardColor.Yellow, StandardColor.LightGray)
-            });
-
+        {                  
+            
             Width = Dim.Auto(DimAutoStyle.Content);
             Height = 1;
             
@@ -54,38 +47,54 @@ namespace TurboBuba.UI
                 Width = Dim.Auto(DimAutoStyle.Text),
                 Height = 1
             };
-            Add(_mainLabel);            
+            Add(_mainLabel);
+
+            SetScheme(new Scheme()
+            {
+                Normal = new Terminal.Gui.Drawing.Attribute(StandardColor.White, StandardColor.DimGray),
+                Focus = new Terminal.Gui.Drawing.Attribute(StandardColor.Black, StandardColor.LightGray),
+                HotNormal = new Terminal.Gui.Drawing.Attribute(StandardColor.Yellow, StandardColor.DimGray),
+                HotFocus = new Terminal.Gui.Drawing.Attribute(StandardColor.Yellow, StandardColor.LightGray),
+                Highlight = new Terminal.Gui.Drawing.Attribute(StandardColor.Black, StandardColor.Yellow)
+            });
+
+            //SetAttributeForRole(VisualRole.Highlight);
+            //var attr = SetAttributeForRole(VisualRole.Highlight);
+            Debug.WriteLine("BottomPanel Render()");
+
+            
             AddCommand(Command.Select, () => SelectItem());
             MouseEnter += (sender, e) =>
             {
-                Logger.Log("ExchangeStatusItem MouseEnter");
                 SetScheme(new Scheme()
                 {
-                    Normal = new Terminal.Gui.Drawing.Attribute(StandardColor.Blue, StandardColor.DimGray),
+                    Normal = new Terminal.Gui.Drawing.Attribute(StandardColor.White, StandardColor.Yellow),
                     Focus = new Terminal.Gui.Drawing.Attribute(StandardColor.Black, StandardColor.LightGray),
                     HotNormal = new Terminal.Gui.Drawing.Attribute(StandardColor.Yellow, StandardColor.DimGray),
-                    HotFocus = new Terminal.Gui.Drawing.Attribute(StandardColor.Yellow, StandardColor.LightGray)
+                    HotFocus = new Terminal.Gui.Drawing.Attribute(StandardColor.Yellow, StandardColor.LightGray),
+                    Highlight = new Terminal.Gui.Drawing.Attribute(StandardColor.Black, StandardColor.Yellow)
                 });
-
-
+                //SetAttributeForRole(VisualRole.Highlight);
+                Debug.WriteLine("Mouse Entered ExchangeStatusItem");
+                
+                //e.Cancel = true;
+                
                 //Mouse entered the view
                 //UpdateTooltip("Hovering over button");
             };
 
             MouseLeave += (sender, e) =>
             {
-                Logger.Log("ExchangeStatusItem MouseLeave");
                 SetScheme(new Scheme()
                 {
                     Normal = new Terminal.Gui.Drawing.Attribute(StandardColor.White, StandardColor.DimGray),
                     Focus = new Terminal.Gui.Drawing.Attribute(StandardColor.Black, StandardColor.LightGray),
                     HotNormal = new Terminal.Gui.Drawing.Attribute(StandardColor.Yellow, StandardColor.DimGray),
-                    HotFocus = new Terminal.Gui.Drawing.Attribute(StandardColor.Yellow, StandardColor.LightGray)
+                    HotFocus = new Terminal.Gui.Drawing.Attribute(StandardColor.Yellow, StandardColor.LightGray),
+                    Highlight = new Terminal.Gui.Drawing.Attribute(StandardColor.Black, StandardColor.Yellow)
                 });
-
-                // Mouse left the view  
-                //HideTooltip();
             };
+            
 
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using TurboBuba.Infrastructure;
+using TurboBuba.MarketData;
 
 namespace TurboBuba.Exchanges
 {
@@ -20,6 +21,7 @@ namespace TurboBuba.Exchanges
 
         private Dictionary<string, ContractInfo> _contracts = new();
         protected ExchangeSubscriptionManager _subscriptionManager  = new();
+        protected MarketDataManager _marketDataManager = new();
 
         public bool IsConnected { get; protected set; } = false;
 
@@ -29,8 +31,8 @@ namespace TurboBuba.Exchanges
         }
 
         #region Abstract methods
-        public abstract void Connect();
-        public abstract void SubscribeOrderBook(string contract, int depth, IExchangeSubscriptionConsumer consumer);
+        public abstract Task Connect();
+        public abstract Task SubscribeOrderBook(string contract, int depth, IExchangeSubscriptionConsumer consumer);
         #endregion
 
         #region Events

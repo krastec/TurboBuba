@@ -1,37 +1,60 @@
 ﻿using Binance.Net.Clients;
+using Binance.Net.Interfaces;
+using Binance.Net.SymbolOrderBooks;
+using CryptoExchange.Net.Interfaces;
+using CryptoExchange.Net.Objects;
+using CryptoExchange.Net.Objects.Sockets;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
+using System.Threading.Tasks;
 using TurboBuba.Infrastructure;
+using TurboBuba.MarketData.OrderBook;
+
 
 namespace TurboBuba.Exchanges
 {
     public class BinanceController : BaseExchangeController
     {
         private BinanceSocketClient _socketClient = null!;
+        private BinanceRestClient _restClient = null!;
 
         public BinanceController() : base(ExchangesList.Binance)
         {
         }
 
-        public override async void Connect()
+        public override async Task Connect()
         {
             this.ConnectionStatusChanged(ExchangeConnectionStatus.Connecting);
+            _restClient = new BinanceRestClient();            
             _socketClient = new BinanceSocketClient();
-            await _socketClient.UsdFuturesApi.PrepareConnectionsAsync();            
+
+            var connection = await _socketClient.UsdFuturesApi.PrepareConnectionsAsync();                        
             this.ConnectionStatusChanged(ExchangeConnectionStatus.Connected);
+
+            var sw = Stopwatch.StartNew();
+            var time = await _restClient.SpotApi.ExchangeData.GetServerTimeAsync();
+            sw.Stop();
+
+            var serverTime = time.Data;
+            var localTime = DateTime.UtcNow - TimeSpan.FromMilliseconds(sw.ElapsedMilliseconds / 2);
+
+            var TimeOffset = serverTime - localTime;
+            Debug.WriteLine($"[{ExchangesList.Binance}] Time offset: {TimeOffset.TotalMilliseconds} ms");
+
         }
 
-        public override void SubscribeOrderBook(string contract, int depth, IExchangeSubscriptionConsumer consumer)
-        {
+        public override async Task SubscribeOrderBook(string contract, int depth, IExchangeSubscriptionConsumer consumer)
+        {            
             var contractInfo = this.GetContract(contract);
             if(contractInfo == null)
             {
                 Logger.Error($"[{ExchangesList.Binance}] Cannot subscribe to order book for unknown contract '{contract}'");
                 return;
             }
-
-            var subscriptionKey = ExchangeSubscriptionManager.GetSubscriptionKey(contract, contractInfo.ContractType, ExchangeSubscription.SubscriptionType.OrderBook);
+            //await GetOrderBookSnapshot(contractInfo);
+            var subscriptionKey = ExchangeSubscriptionManager.GetSubscriptionKey(contractInfo, ExchangeSubscription.SubscriptionType.OrderBook);
             var existingSubscription = _subscriptionManager.GetSubscription(subscriptionKey);
             if(existingSubscription != null)
             {
@@ -45,18 +68,75 @@ namespace TurboBuba.Exchanges
                 var subscription = _subscriptionManager.AddSubscription(
                     subscriptionKey,
                     ExchangeSubscription.SubscriptionType.OrderBook,
-                    contractInfo.ContractType,
-                    contract,
+                    contractInfo,
                     topic,
                     consumer,
                     new Dictionary<string, string> { { "depth", depth.ToString() } }
                 );
+                
+                //await GetOrderBookSnapshot(contractInfo);
 
-                //this._socketClient.UsdFuturesApi.ExchangeData.SubscribeToOrderBookUpdatesAsync);
-                //subscription.CancelationToken = ...;
+                OrderBook orderBook = _marketDataManager.OrderBooksManager.CreateOrGetOrderBook(contractInfo);                
+                var stream = await this._socketClient.UsdFuturesApi.ExchangeData.SubscribeToOrderBookUpdatesAsync(contractInfo.Contract, 100, (data) => { OnOrderBookUpdate(data, orderBook); });
+                subscription.SubscriptionId = stream.Data.Id;
+                //_socketClient.UnsubscribeAsync(subscription.SubscriptionId);
             }
+        }
+
+        private async Task GetOrderBookSnapshot(ContractInfo contractInfo)
+        {
+            var sw = Stopwatch.StartNew();
+            var snapshot = await _restClient.UsdFuturesApi.ExchangeData.GetOrderBookAsync(contractInfo.Contract);
+            sw.Stop();
+            Console.WriteLine($"Snapshot time: {sw.ElapsedMilliseconds} ms");
 
         }
+
+        private void OnOrderBookUpdate(DataEvent<IBinanceFuturesEventOrderBook> data, OrderBook orderBook)
+        {
+            //data.ReceiveTime - data.Data.TransactionTime;
+            var latency = data.Data.EventTime - data.ReceiveTime;
+            var latencyMs = latency.TotalMilliseconds;
+            Debug.WriteLine($"[{ExchangesList.Binance}] OB update latency: {latencyMs:F1} ms");
+
+            //var serverEventTime = data.Data.EventTime;
+            //var localReceiptTime = DateTime.UtcNow;
+            //var latency = localReceiptTime - serverEventTime;
+            //Debug.WriteLine($"WS latency: {latency.TotalMilliseconds} ms");
+
+            OrderBookUpdate update = new OrderBookUpdate();
+            update.FirstUpdateId = data.Data.FirstUpdateId;
+            update.LastUpdateId = data.Data.LastUpdateId;
+            update.PrevLastUpdateId = data.Data.LastUpdateIdStream;
+
+            // Preallocate arrays for best performance
+            var bidsCount = data.Data.Bids.Length;
+            var asksCount = data.Data.Asks.Length;
+
+            update.Bids = bidsCount == 0 ? Array.Empty<OrderBookLevel>() : new OrderBookLevel[bidsCount];
+            update.Asks = asksCount == 0 ? Array.Empty<OrderBookLevel>() : new OrderBookLevel[asksCount];
+
+            // Copy bids
+            for (int i = 0; i < bidsCount; i++)
+            {
+                var b = data.Data.Bids[i];
+                update.Bids[i] = new OrderBookLevel(b.Price, b.Quantity);
+            }
+
+            // Copy asks
+            for (int i = 0; i < asksCount; i++)
+            {
+                var a = data.Data.Asks[i];
+                update.Asks[i] = new OrderBookLevel(a.Price, a.Quantity);
+            }
+
+            orderBook.ApplyUpdate(update);
+
+            //var contractInfo = GetContract("BTCUSDT");
+            //var subscriptionKey = ExchangeSubscriptionManager.GetSubscriptionKey(contractInfo, ExchangeSubscription.SubscriptionType.OrderBook);
+            //var existingSubscription = _subscriptionManager.GetSubscription(subscriptionKey);            
+        }
+
 
 
     }
