@@ -7,6 +7,7 @@ using TurboBuba.UI;
 using TurboBuba.Events;
 using TurboBuba.Infrastructure;
 using TurboBuba.Exchanges;
+using Microsoft.AspNetCore.Builder;
 
 
 
@@ -41,8 +42,20 @@ namespace TurboBuba
 
             });
 
-            var mainWindow = serviceProvider.GetService<MainWindow>();
-            mainWindow?.Show(); 
+            var builder = WebApplication.CreateBuilder();
+            builder.Services.AddGrpc();
+            var app = builder.Build();
+
+            // Маршрутизируем gRPC
+            //app.MapGrpcService<PingPongService>();
+            // Дополнительно простой hello endpoint для проверки
+            //app.MapGet("/", () => "PingPong gRPC server is running.");
+            //app.Urls.Add("http://localhost:5000"); // слушать на 5000 (HTTP/2 over plaintext)
+
+            app.Run();
+
+            //var mainWindow = serviceProvider.GetService<MainWindow>();
+            //mainWindow?.Show(); 
         }
     }
 }

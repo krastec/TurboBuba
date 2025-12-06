@@ -1,3 +1,6 @@
 <Solution>
+  <Folder Name="/Protos/">
+    <File Path="pingpong.proto" />
+  </Folder>
   <Project Path="TurboBuba.csproj" />
 </Solution>

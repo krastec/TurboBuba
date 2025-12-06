@@ -79,17 +79,15 @@ namespace TurboBuba.Exchanges
                 OrderBook orderBook = _marketDataManager.OrderBooksManager.CreateOrGetOrderBook(contractInfo);                
                 var stream = await this._socketClient.UsdFuturesApi.ExchangeData.SubscribeToOrderBookUpdatesAsync(contractInfo.Contract, 100, (data) => { OnOrderBookUpdate(data, orderBook); });
                 subscription.SubscriptionId = stream.Data.Id;
+
                 //_socketClient.UnsubscribeAsync(subscription.SubscriptionId);
             }
         }
 
         private async Task GetOrderBookSnapshot(ContractInfo contractInfo)
         {
-            var sw = Stopwatch.StartNew();
             var snapshot = await _restClient.UsdFuturesApi.ExchangeData.GetOrderBookAsync(contractInfo.Contract);
-            sw.Stop();
-            Console.WriteLine($"Snapshot time: {sw.ElapsedMilliseconds} ms");
-
+            
         }
 
         private void OnOrderBookUpdate(DataEvent<IBinanceFuturesEventOrderBook> data, OrderBook orderBook)
@@ -113,21 +111,19 @@ namespace TurboBuba.Exchanges
             var bidsCount = data.Data.Bids.Length;
             var asksCount = data.Data.Asks.Length;
 
-            update.Bids = bidsCount == 0 ? Array.Empty<OrderBookLevel>() : new OrderBookLevel[bidsCount];
-            update.Asks = asksCount == 0 ? Array.Empty<OrderBookLevel>() : new OrderBookLevel[asksCount];
 
-            // Copy bids
+            update.Bids = bidsCount == 0 ? Array.Empty<long[]>() : new long[bidsCount][];
+            update.Asks = asksCount == 0 ? Array.Empty<long[]>() : new long[asksCount][];
+
             for (int i = 0; i < bidsCount; i++)
             {
                 var b = data.Data.Bids[i];
-                update.Bids[i] = new OrderBookLevel(b.Price, b.Quantity);
+                update.Bids[i] = new long[2] { (long)(b.Price * orderBook.PriceScale), (long)b.Quantity };
             }
-
-            // Copy asks
             for (int i = 0; i < asksCount; i++)
             {
                 var a = data.Data.Asks[i];
-                update.Asks[i] = new OrderBookLevel(a.Price, a.Quantity);
+                update.Asks[i] = new long[2] { (long)(a.Price * orderBook.PriceScale), (long)a.Quantity };
             }
 
             orderBook.ApplyUpdate(update);
