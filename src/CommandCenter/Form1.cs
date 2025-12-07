@@ -19,7 +19,8 @@ namespace CommandCenter
 
             // Создаём канал
             var httpHandler = new HttpClientHandler();
-            var channel = GrpcChannel.ForAddress("http://localhost:5000", new GrpcChannelOptions
+            //httpHandler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+            var channel = GrpcChannel.ForAddress("https://localhost:5000", new GrpcChannelOptions
             {
                 HttpHandler = httpHandler
             });

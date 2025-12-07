@@ -8,6 +8,7 @@ using TurboBuba.Events;
 using TurboBuba.Infrastructure;
 using TurboBuba.Exchanges;
 using Microsoft.AspNetCore.Builder;
+using TurboBuba.Grpc;
 
 
 
@@ -47,10 +48,10 @@ namespace TurboBuba
             var app = builder.Build();
 
             // Маршрутизируем gRPC
-            //app.MapGrpcService<PingPongService>();
+            app.MapGrpcService<PingPongService>();
             // Дополнительно простой hello endpoint для проверки
-            //app.MapGet("/", () => "PingPong gRPC server is running.");
-            //app.Urls.Add("http://localhost:5000"); // слушать на 5000 (HTTP/2 over plaintext)
+            app.MapGet("/", () => "PingPong gRPC server is running.");
+            app.Urls.Add("https://localhost:5000"); // слушать на 5000 (HTTP/2 over plaintext)
 
             app.Run();
 
