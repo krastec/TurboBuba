@@ -26,9 +26,10 @@ namespace TurboBuba
                 .AddSingleton<MainWindow>()
                 .AddSingleton<AppController>()
 
+                .AddSingleton<GrpcServer>()
                 //ui
                 //.AddTransient<ExchangeStatusItem>()
-                
+
                 .BuildServiceProvider();
 
             var appController = serviceProvider.GetService<AppController>();
@@ -44,14 +45,17 @@ namespace TurboBuba
 
             });
 
+            var grpcServer = serviceProvider.GetService<GrpcServer>();
+            grpcServer.Run();
+
             //Task.Run(async () =>
             //{
-                var grpcServer = new GrpcServer();
-                grpcServer.Run();
+            //var grpcServer = new GrpcServer();
+            //grpcServer.Run();
 
             //});
 
-            
+
 
             //var mainWindow = serviceProvider.GetService<MainWindow>();
             //mainWindow?.Show(); 
