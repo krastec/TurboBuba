@@ -8,8 +8,8 @@ namespace TurboBuba.MarketData.OrderBook
     public class OrderBookData
     {
         public long TimeStamp = 0;
-        public SortedList<long, long> Bids = new();
-        public SortedList<long, long> Asks = new();
+        public SortedList<decimal, decimal> Bids = new();
+        public SortedList<decimal, decimal> Asks = new();
 
         public OrderBookData Clone()
         {
@@ -18,13 +18,13 @@ namespace TurboBuba.MarketData.OrderBook
 
 
             // Preserve comparer and copy entries(shallow copy of values)
-            clone.Bids = new SortedList<long, long>(this.Bids.Comparer);
+            clone.Bids = new SortedList<decimal, decimal>(this.Bids.Comparer);
             foreach (var kv in this.Bids)
             {
                 clone.Bids.Add(kv.Key, kv.Value);
             }
 
-            clone.Asks = new SortedList<long, long>(this.Asks.Comparer);
+            clone.Asks = new SortedList<decimal, decimal>(this.Asks.Comparer);
             foreach (var kv in this.Asks)
             {
                 clone.Asks.Add(kv.Key, kv.Value);
@@ -50,8 +50,8 @@ namespace TurboBuba.MarketData.OrderBook
         public long? FirstUpdateId = 0;
         public long LastUpdateId = 0;
         public long PrevLastUpdateId = 0;
-        public long[][] Bids = Array.Empty<long[]>();
-        public long[][] Asks = Array.Empty<long[]>();
+        public decimal[][] Bids = Array.Empty<decimal[]>();
+        public decimal[][] Asks = Array.Empty<decimal[]>();
         //public OrderBookLevel[] Bids = Array.Empty<OrderBookLevel>();
         //public OrderBookLevel[] Asks = Array.Empty<OrderBookLevel>();
     }

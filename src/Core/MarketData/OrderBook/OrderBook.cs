@@ -36,6 +36,43 @@ namespace TurboBuba.MarketData.OrderBook
             //Array.Copy(update.Bids, orderBook.Bids, update.Bids.Length);
             //Array.Copy(update.Asks, orderBook.Asks, update.Asks.Length);
 
+            //orderBook.Bids = new SortedList<decimal, decimal>();
+            //orderBook.Asks = new SortedList<decimal, decimal>();
+            orderBook.Bids = new SortedList<decimal, decimal>(Comparer<decimal>.Create((x, y) => y.CompareTo(x)));
+            orderBook.Asks = new SortedList<decimal, decimal>(Comparer<decimal>.Create((x, y) => x.CompareTo(y)));
+
+            // BIDS
+            if (update.Bids != null)
+            {
+                foreach (var bid in update.Bids)
+                {
+                    if (bid == null || bid.Length < 2)
+                        continue;
+                    decimal price = bid[0];
+                    decimal qty = bid[1];
+                    if (qty != 0M)
+                    {
+                        orderBook.Bids[price] = qty;
+                    }
+                }
+            }
+            // ASKS
+            if (update.Asks != null)
+            {
+                foreach (var ask in update.Asks)
+                {
+                    if (ask == null || ask.Length < 2)
+                        continue;
+                    decimal price = ask[0];
+                    decimal qty = ask[1];
+                    if (qty != 0M)
+                    {
+                        orderBook.Asks[price] = qty;
+                    }
+                }
+            }
+
+
             _snapshotLastUpdateId += update.LastUpdateId;
             _snapshotApplied = true;
             _orderBooks.Add(orderBook);
@@ -66,13 +103,66 @@ namespace TurboBuba.MarketData.OrderBook
                 return true;
             }
 
+            if(_updatesCounter > 0 && update.PrevLastUpdateId != _prevLastUpdateId)
+            {
+                Logger.Warn($"OrderBook: Update sequence mismatch. Expected PrevLastUpdateId={_prevLastUpdateId}, but got {update.PrevLastUpdateId}. Update skipped.");
+                return false;
+            }
+
             var prevOrderBook = _orderBooks[_orderBooks.Count - 1];
             var newOrderBook = prevOrderBook.Clone();
             newOrderBook.TimeStamp = TimeUtils.GetCurrentUnixTimestampMillis();
-            // Apply bids
 
+            // BIDS: update levels (update.Bids is long[][] where [0]=priceScaled, [1]=qtyScaled)
+            if (update.Bids != null)
+            {
+                foreach (var bid in update.Bids)
+                {
+                    if (bid == null || bid.Length < 2)
+                        continue;
 
+                    decimal price = bid[0];
+                    decimal qty = bid[1];
 
+                    if (qty == 0M)
+                    {
+                        newOrderBook.Bids.Remove(price);
+                    }
+                    else
+                    {
+                        // upsert price -> qty
+                        newOrderBook.Bids[price] = qty;
+                    }
+                }
+            }
+
+            // ASKS: update levels (update.Asks is long[][] where [0]=priceScaled, [1]=qtyScaled)
+            if (update.Asks != null)
+            {
+                foreach (var ask in update.Asks)
+                {
+                    if (ask == null || ask.Length < 2)
+                        continue;
+
+                    decimal price = ask[0];
+                    decimal qty = ask[1];
+
+                    if (qty == 0M)
+                    {
+                        newOrderBook.Asks.Remove(price);
+                    }
+                    else
+                    {
+                        // upsert price -> qty
+                        newOrderBook.Asks[price] = qty;
+                    }
+                }
+            }
+
+            // bookkeeping
+            _orderBooks.Add(newOrderBook);
+            _updatesCounter++;
+            _prevLastUpdateId = update.LastUpdateId;
 
             return true;
         }

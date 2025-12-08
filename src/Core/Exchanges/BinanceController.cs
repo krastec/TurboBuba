@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TurboBuba.Infrastructure;
 using TurboBuba.MarketData.OrderBook;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace TurboBuba.Exchanges
@@ -81,13 +82,38 @@ namespace TurboBuba.Exchanges
                 subscription.SubscriptionId = stream.Data.Id;
 
                 //_socketClient.UnsubscribeAsync(subscription.SubscriptionId);
+                GetAndApplyOrderBookSnapshot(contractInfo);
             }
         }
 
-        private async Task GetOrderBookSnapshot(ContractInfo contractInfo)
+        private async Task GetAndApplyOrderBookSnapshot(ContractInfo contractInfo)
         {
-            var snapshot = await _restClient.UsdFuturesApi.ExchangeData.GetOrderBookAsync(contractInfo.Contract);
-            
+            var snapshot = await _restClient.UsdFuturesApi.ExchangeData.GetOrderBookAsync(contractInfo.Contract, 1000);
+            var orderBook = _marketDataManager.OrderBooksManager.GetOrderBook(contractInfo);
+
+            OrderBookUpdate update = new OrderBookUpdate();
+            update.FirstUpdateId = 0;
+            update.PrevLastUpdateId = 0;
+            update.LastUpdateId = snapshot.Data.LastUpdateId;
+
+            var bidsCount = snapshot.Data.Bids.Length;
+            var asksCount = snapshot.Data.Asks.Length;
+
+            update.Bids = bidsCount == 0 ? Array.Empty<decimal[]>() : new decimal[bidsCount][];
+            update.Asks = asksCount == 0 ? Array.Empty<decimal[]>() : new decimal[asksCount][];
+
+            for (int i = 0; i < bidsCount; i++)
+            {
+                var b = snapshot.Data.Bids[i];
+                update.Bids[i] = new decimal[2] { b.Price, b.Quantity };
+            }
+            for (int i = 0; i < asksCount; i++)
+            {
+                var a = snapshot.Data.Asks[i];
+                update.Asks[i] = new decimal[2] { a.Price, a.Quantity };
+            }
+
+            orderBook.InitFromSnapshot(update);
         }
 
         private void OnOrderBookUpdate(DataEvent<IBinanceFuturesEventOrderBook> data, OrderBook orderBook)
@@ -112,18 +138,18 @@ namespace TurboBuba.Exchanges
             var asksCount = data.Data.Asks.Length;
 
 
-            update.Bids = bidsCount == 0 ? Array.Empty<long[]>() : new long[bidsCount][];
-            update.Asks = asksCount == 0 ? Array.Empty<long[]>() : new long[asksCount][];
+            update.Bids = bidsCount == 0 ? Array.Empty<decimal[]>() : new decimal[bidsCount][];
+            update.Asks = asksCount == 0 ? Array.Empty<decimal[]>() : new decimal[asksCount][];
 
             for (int i = 0; i < bidsCount; i++)
             {
                 var b = data.Data.Bids[i];
-                update.Bids[i] = new long[2] { (long)(b.Price * orderBook.PriceScale), (long)b.Quantity };
+                update.Bids[i] = new decimal[2] { b.Price, b.Quantity };
             }
             for (int i = 0; i < asksCount; i++)
             {
                 var a = data.Data.Asks[i];
-                update.Asks[i] = new long[2] { (long)(a.Price * orderBook.PriceScale), (long)a.Quantity };
+                update.Asks[i] = new decimal[2] { a.Price, a.Quantity };
             }
 
             orderBook.ApplyUpdate(update);
