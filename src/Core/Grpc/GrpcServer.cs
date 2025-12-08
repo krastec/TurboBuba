@@ -26,9 +26,7 @@ namespace TurboBuba.Grpc
             
             builder.Services.AddSingleton<AppController>(appController);
 
-            builder.Services.AddSingleton<IPublisher<StatusUpdate>>(sp =>
-                new GenericPublisher<StatusUpdate>(
-                msg => new[] { msg.Component }));
+            builder.Services.AddSingleton<IPublisher<StatusUpdate>>(sp => new GenericPublisher<StatusUpdate>(msg => new[] { msg.Component }));
             builder.Services.AddSingleton<StatusServiceImpl>();
 
             var app = builder.Build();
