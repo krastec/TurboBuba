@@ -35,9 +35,8 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="pingpong.proto" />
+    <None Include="status.proto" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="NewFolder1\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

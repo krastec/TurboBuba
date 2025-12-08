@@ -1,0 +1,26 @@
+syntax = "proto3";
+package turbobuba.status.v1;
+option csharp_namespace = "TurboBuba.Status.V1";
+
+enum ConnState {
+	UNKNOWN = 0;
+	CONNECTED = 1;
+	DISCONNECTED = 2;
+}
+
+message StatusUpdate {
+	string component = 1; // e.g. "ExchangeAPI:Binance"
+	ConnState state = 2;
+	int32 ping_out = 3;
+	int32 ping_in = 4;
+	int64 timestamp_ms = 5;
+	string message = 6;
+}
+
+message StatusSubscribeRequest {
+	repeated string components = 1; // empty = all
+}
+
+service StatusService {
+	rpc SubscribeStatus(StatusSubscribeRequest) returns (stream StatusUpdate);
+}

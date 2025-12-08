@@ -45,13 +45,13 @@ namespace TurboBuba.Exchanges
         #endregion
 
         #region Contract management
-        public ContractInfo RegisterContract(string contract, ContractType type, int priceScale, int multiplier)
+        public ContractInfo RegisterContract(string contract, ContractType type, int priceScale, int qtyScale, int multiplier)
         {
             {
                 var upperContract = contract.ToUpperInvariant();
                 if (!_contracts.ContainsKey(contract))
                 {
-                    _contracts.Add(contract, new ContractInfo(contract, type, priceScale, multiplier));
+                    _contracts.Add(contract, new ContractInfo(contract, type, priceScale, qtyScale, multiplier));
                 }
 
                 return _contracts[contract];

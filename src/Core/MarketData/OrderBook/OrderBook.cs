@@ -17,11 +17,19 @@ namespace TurboBuba.MarketData.OrderBook
         private long _prevLastUpdateId = 0;
         private long _updatesCounter = 0;
 
-        private List<OrderBookUpdate> _preSnapshotUpdates = new();
+        private long _initialTimeStamp = 0;
+        private int _skippedUpdatesCounter = 0;
 
+        
+
+        private List<OrderBookUpdate> _preSnapshotUpdates = new();
         private List<OrderBookData> _orderBooks = new();
 
         public int PriceScale => _contractInfo.PriceScale;
+        public int QtyScale => _contractInfo.QtyScale;
+        public int SkippedUpdatesCounter => _skippedUpdatesCounter;
+        public ContractInfo ContractInfo => _contractInfo;
+
         public OrderBook(ContractInfo contractInfo)
         {
             _contractInfo = contractInfo;
@@ -38,8 +46,8 @@ namespace TurboBuba.MarketData.OrderBook
 
             //orderBook.Bids = new SortedList<decimal, decimal>();
             //orderBook.Asks = new SortedList<decimal, decimal>();
-            orderBook.Bids = new SortedList<decimal, decimal>(Comparer<decimal>.Create((x, y) => y.CompareTo(x)));
-            orderBook.Asks = new SortedList<decimal, decimal>(Comparer<decimal>.Create((x, y) => x.CompareTo(y)));
+            orderBook.Bids = new SortedList<scaledPrice, scaledPrice>(Comparer<scaledPrice>.Create((x, y) => y.CompareTo(x)));
+            orderBook.Asks = new SortedList<scaledPrice, scaledPrice>(Comparer<scaledPrice>.Create((x, y) => x.CompareTo(y)));
 
             // BIDS
             if (update.Bids != null)
@@ -48,9 +56,9 @@ namespace TurboBuba.MarketData.OrderBook
                 {
                     if (bid == null || bid.Length < 2)
                         continue;
-                    decimal price = bid[0];
-                    decimal qty = bid[1];
-                    if (qty != 0M)
+                    scaledPrice price = bid[0];
+                    scaledPrice qty = bid[1];
+                    if (qty != 0)
                     {
                         orderBook.Bids[price] = qty;
                     }
@@ -63,9 +71,9 @@ namespace TurboBuba.MarketData.OrderBook
                 {
                     if (ask == null || ask.Length < 2)
                         continue;
-                    decimal price = ask[0];
-                    decimal qty = ask[1];
-                    if (qty != 0M)
+                    scaledPrice price = ask[0];
+                    scaledPrice qty = ask[1];
+                    if (qty != 0)
                     {
                         orderBook.Asks[price] = qty;
                     }
@@ -73,7 +81,7 @@ namespace TurboBuba.MarketData.OrderBook
             }
 
 
-            _snapshotLastUpdateId += update.LastUpdateId;
+            _snapshotLastUpdateId = update.LastUpdateId;
             _snapshotApplied = true;
             _orderBooks.Add(orderBook);
 
@@ -88,13 +96,15 @@ namespace TurboBuba.MarketData.OrderBook
 
             foreach (var preSnapshotUpdate in this._preSnapshotUpdates)
             {
-                ApplyUpdate(preSnapshotUpdate);
+                ApplyUpdate(preSnapshotUpdate, true);
             }
+
+            _initialTimeStamp = TimeUtils.GetCurrentUnixTimestampMillis();
 
             return true;
         }
 
-        public bool ApplyUpdate(OrderBookUpdate update)
+        public bool ApplyUpdate(OrderBookUpdate update, bool applyWithoutCopy = false)
         {
             if (!_snapshotApplied)
             {
@@ -106,11 +116,16 @@ namespace TurboBuba.MarketData.OrderBook
             if(_updatesCounter > 0 && update.PrevLastUpdateId != _prevLastUpdateId)
             {
                 Logger.Warn($"OrderBook: Update sequence mismatch. Expected PrevLastUpdateId={_prevLastUpdateId}, but got {update.PrevLastUpdateId}. Update skipped.");
+                _skippedUpdatesCounter++;
                 return false;
             }
 
             var prevOrderBook = _orderBooks[_orderBooks.Count - 1];
-            var newOrderBook = prevOrderBook.Clone();
+            OrderBookData newOrderBook;
+            if(applyWithoutCopy)
+                newOrderBook = prevOrderBook;
+            else
+                newOrderBook = prevOrderBook.Clone();
             newOrderBook.TimeStamp = TimeUtils.GetCurrentUnixTimestampMillis();
 
             // BIDS: update levels (update.Bids is long[][] where [0]=priceScaled, [1]=qtyScaled)
@@ -121,8 +136,8 @@ namespace TurboBuba.MarketData.OrderBook
                     if (bid == null || bid.Length < 2)
                         continue;
 
-                    decimal price = bid[0];
-                    decimal qty = bid[1];
+                    scaledPrice price = bid[0];
+                    scaledPrice qty = bid[1];
 
                     if (qty == 0M)
                     {
@@ -144,8 +159,8 @@ namespace TurboBuba.MarketData.OrderBook
                     if (ask == null || ask.Length < 2)
                         continue;
 
-                    decimal price = ask[0];
-                    decimal qty = ask[1];
+                    scaledPrice price = ask[0];
+                    scaledPrice qty = ask[1];
 
                     if (qty == 0M)
                     {
@@ -160,9 +175,11 @@ namespace TurboBuba.MarketData.OrderBook
             }
 
             // bookkeeping
-            _orderBooks.Add(newOrderBook);
+            if(applyWithoutCopy == false)
+                _orderBooks.Add(newOrderBook);
             _updatesCounter++;
             _prevLastUpdateId = update.LastUpdateId;
+            _skippedUpdatesCounter = 0;
 
             return true;
         }
@@ -173,6 +190,8 @@ namespace TurboBuba.MarketData.OrderBook
             _snapshotLastUpdateId = 0;
             _prevLastUpdateId = 0;
             _updatesCounter = 0;
+            _skippedUpdatesCounter = 0;
+            _initialTimeStamp = 0;
             _preSnapshotUpdates.Clear();
             _orderBooks.Clear();
         }

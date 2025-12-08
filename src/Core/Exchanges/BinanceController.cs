@@ -99,18 +99,18 @@ namespace TurboBuba.Exchanges
             var bidsCount = snapshot.Data.Bids.Length;
             var asksCount = snapshot.Data.Asks.Length;
 
-            update.Bids = bidsCount == 0 ? Array.Empty<decimal[]>() : new decimal[bidsCount][];
-            update.Asks = asksCount == 0 ? Array.Empty<decimal[]>() : new decimal[asksCount][];
+            update.Bids = bidsCount == 0 ? Array.Empty<scaledPrice[]>() : new scaledPrice[bidsCount][];
+            update.Asks = asksCount == 0 ? Array.Empty<scaledPrice[]>() : new scaledPrice[asksCount][];
 
             for (int i = 0; i < bidsCount; i++)
             {
                 var b = snapshot.Data.Bids[i];
-                update.Bids[i] = new decimal[2] { b.Price, b.Quantity };
+                update.Bids[i] = new scaledPrice[2] { (scaledPrice)(b.Price * orderBook.PriceScale), (scaledPrice)(b.Quantity * orderBook.QtyScale) };
             }
             for (int i = 0; i < asksCount; i++)
             {
                 var a = snapshot.Data.Asks[i];
-                update.Asks[i] = new decimal[2] { a.Price, a.Quantity };
+                update.Asks[i] = new scaledPrice[2] { (scaledPrice)(a.Price * orderBook.PriceScale), (scaledPrice)(a.Quantity * orderBook.QtyScale) };
             }
 
             orderBook.InitFromSnapshot(update);
@@ -119,7 +119,7 @@ namespace TurboBuba.Exchanges
         private void OnOrderBookUpdate(DataEvent<IBinanceFuturesEventOrderBook> data, OrderBook orderBook)
         {
             //data.ReceiveTime - data.Data.TransactionTime;
-            var latency = data.Data.EventTime - data.ReceiveTime;
+            var latency = data.ReceiveTime - data.Data.EventTime;
             var latencyMs = latency.TotalMilliseconds;
             Debug.WriteLine($"[{ExchangesList.Binance}] OB update latency: {latencyMs:F1} ms");
 
@@ -138,21 +138,26 @@ namespace TurboBuba.Exchanges
             var asksCount = data.Data.Asks.Length;
 
 
-            update.Bids = bidsCount == 0 ? Array.Empty<decimal[]>() : new decimal[bidsCount][];
-            update.Asks = asksCount == 0 ? Array.Empty<decimal[]>() : new decimal[asksCount][];
+            update.Bids = bidsCount == 0 ? Array.Empty<scaledPrice[]>() : new scaledPrice[bidsCount][];
+            update.Asks = asksCount == 0 ? Array.Empty<scaledPrice[]>() : new scaledPrice[asksCount][];
 
             for (int i = 0; i < bidsCount; i++)
             {
                 var b = data.Data.Bids[i];
-                update.Bids[i] = new decimal[2] { b.Price, b.Quantity };
+                update.Bids[i] = new scaledPrice[2] { (scaledPrice)(b.Price * orderBook.PriceScale), (scaledPrice)(b.Quantity * orderBook.QtyScale) };
             }
             for (int i = 0; i < asksCount; i++)
             {
                 var a = data.Data.Asks[i];
-                update.Asks[i] = new decimal[2] { a.Price, a.Quantity };
+                update.Asks[i] = new scaledPrice[2] { (scaledPrice)(a.Price * orderBook.PriceScale), (scaledPrice)(a.Quantity * orderBook.QtyScale) };
             }
 
-            orderBook.ApplyUpdate(update);
+            var applied = orderBook.ApplyUpdate(update);
+            if(applied == false)
+            {
+                orderBook.Reset();
+                GetAndApplyOrderBookSnapshot(orderBook.ContractInfo);
+            }
 
             //var contractInfo = GetContract("BTCUSDT");
             //var subscriptionKey = ExchangeSubscriptionManager.GetSubscriptionKey(contractInfo, ExchangeSubscription.SubscriptionType.OrderBook);
