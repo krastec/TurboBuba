@@ -183,5 +183,15 @@ namespace CommandCenter.Signal
             }
             catch { }
         }
+
+        /*
+         * разовые запросы
+        public async Task GetExchanges()
+        {
+            var exchanges = await _hub.InvokeAsync<List<ExchangeDto>>("GetExchanges");
+            foreach (var e in exchanges)
+                Console.WriteLine($"{e.Id} - {e.Name} - {e.Url}");
+        }
+        */
     }
 }
