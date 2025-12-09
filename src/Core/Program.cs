@@ -10,6 +10,7 @@ using TurboBuba.Exchanges;
 using Microsoft.AspNetCore.Builder;
 using TurboBuba.Grpc;
 using TurboBuba.Status.V1;
+using TurboBuba.Signal;
 
 
 
@@ -27,6 +28,7 @@ namespace TurboBuba
                 .AddSingleton<AppController>()
 
                 .AddSingleton<GrpcServer>()
+                .AddSingleton<SignalServer>()
                 //ui
                 //.AddTransient<ExchangeStatusItem>()
 
@@ -45,8 +47,11 @@ namespace TurboBuba
 
             });
 
-            var grpcServer = serviceProvider.GetService<GrpcServer>();
-            grpcServer.Run();
+            var signalServer = serviceProvider.GetService<SignalServer>();
+            signalServer.Run();
+
+            //var grpcServer = serviceProvider.GetService<GrpcServer>();
+            //grpcServer.Run();
 
             //Task.Run(async () =>
             //{
