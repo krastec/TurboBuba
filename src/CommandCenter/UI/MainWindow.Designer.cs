@@ -34,8 +34,9 @@ namespace CommandCenter
             statusStrip1 = new StatusStrip();
             statusBarExchangeStatusHost1 = new StatusBarExchangeStatusHost();
             toolStrip1 = new ToolStrip();
-            grpcUrlTextBox = new ToolStripTextBox();
-            grpcConnectButton = new ToolStripButton();
+            serverConnectionStatusIcon = new ToolStripLabel();
+            serverUrlTextBox = new ToolStripTextBox();
+            serverConnectButton = new ToolStripButton();
             toolStripSeparator1 = new ToolStripSeparator();
             statusStrip1.SuspendLayout();
             toolStrip1.SuspendLayout();
@@ -71,28 +72,36 @@ namespace CommandCenter
             // 
             // toolStrip1
             // 
-            toolStrip1.Items.AddRange(new ToolStripItem[] { grpcUrlTextBox, grpcConnectButton, toolStripSeparator1 });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { serverConnectionStatusIcon, serverUrlTextBox, serverConnectButton, toolStripSeparator1 });
             toolStrip1.Location = new Point(0, 0);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new Size(1317, 25);
             toolStrip1.TabIndex = 2;
             toolStrip1.Text = "toolStrip1";
             // 
-            // grpcUrlTextBox
+            // serverConnectionStatusIcon
             // 
-            grpcUrlTextBox.Name = "grpcUrlTextBox";
-            grpcUrlTextBox.Size = new Size(150, 25);
-            grpcUrlTextBox.Text = "https://localhost:5001/";
+            serverConnectionStatusIcon.AutoSize = false;
+            serverConnectionStatusIcon.Image = Properties.Resources.Connection_error;
+            serverConnectionStatusIcon.Name = "serverConnectionStatusIcon";
+            serverConnectionStatusIcon.Size = new Size(22, 22);
             // 
-            // grpcConnectButton
+            // serverUrlTextBox
             // 
-            grpcConnectButton.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            grpcConnectButton.ImageTransparentColor = Color.Magenta;
-            grpcConnectButton.Name = "grpcConnectButton";
-            grpcConnectButton.Size = new Size(56, 22);
-            grpcConnectButton.Text = "Connect";
-            grpcConnectButton.TextImageRelation = TextImageRelation.ImageAboveText;
-            grpcConnectButton.Click += grpcConnectButton_Click;
+            serverUrlTextBox.Name = "serverUrlTextBox";
+            serverUrlTextBox.Size = new Size(150, 25);
+            serverUrlTextBox.Text = "https://localhost:5001/pilot";
+            // 
+            // serverConnectButton
+            // 
+            serverConnectButton.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            serverConnectButton.ImageAlign = ContentAlignment.MiddleLeft;
+            serverConnectButton.ImageTransparentColor = Color.Magenta;
+            serverConnectButton.Name = "serverConnectButton";
+            serverConnectButton.Size = new Size(56, 22);
+            serverConnectButton.Text = "Connect";
+            serverConnectButton.TextImageRelation = TextImageRelation.ImageAboveText;
+            serverConnectButton.Click += serverConnectButton_Click;
             // 
             // toolStripSeparator1
             // 
@@ -122,9 +131,10 @@ namespace CommandCenter
         private Button button1;
         private StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private ToolStripTextBox grpcUrlTextBox;
-        private ToolStripButton grpcConnectButton;
+        private ToolStripTextBox serverUrlTextBox;
+        private ToolStripButton serverConnectButton;
         private ToolStripSeparator toolStripSeparator1;
         private StatusBarExchangeStatusHost statusBarExchangeStatusHost1;
+        private ToolStripLabel serverConnectionStatusIcon;
     }
 }

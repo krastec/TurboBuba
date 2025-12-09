@@ -18,7 +18,7 @@ namespace TurboBuba.Signal
 
             var app = builder.Build();
 
-            app.MapHub<ServerStatusHub>("/serverstatus");
+            app.MapHub<PilotHub>("/pilot");
 
             app.Run();
         }

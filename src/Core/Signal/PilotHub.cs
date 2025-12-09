@@ -5,7 +5,7 @@ using System.Text;
 
 namespace TurboBuba.Signal
 {
-    public class ServerStatusHub : Hub
+    public class PilotHub : Hub
     {
         // Метод для HFT-бота: отправить обновление всем подписчикам
         public async Task BroadcastUpdate(ServerStatus update)

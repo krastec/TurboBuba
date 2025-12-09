@@ -21,11 +21,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Logger\" />
-    <Folder Include="CommandCenter\" />
-    <Folder Include="Strategies\" />
     <!--<Protobuf Include="..\Protos\pingpong.proto" GrpcServices="Server" />-->
     <Protobuf Include="..\Protos\*.proto" GrpcServices="Server" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="CommandCenter\**" />
+    <Compile Remove="Logger\**" />
+    <Compile Remove="Strategies\**" />
+    <EmbeddedResource Remove="CommandCenter\**" />
+    <EmbeddedResource Remove="Logger\**" />
+    <EmbeddedResource Remove="Strategies\**" />
+    <None Remove="CommandCenter\**" />
+    <None Remove="Logger\**" />
+    <None Remove="Strategies\**" />
   </ItemGroup>
 
 </Project>

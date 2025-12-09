@@ -44,17 +44,27 @@ namespace CommandCenter
         private void RegisterEventHandlers()
         {
             this._eventSubscriber = new EventSubscriber(_appController.EventBus);            
-            _eventSubscriber.Subscribe<GrpcEvents.ConnectionStatusChanged>(OnGrpcConnectionStatusChanged, this);
+            _eventSubscriber.Subscribe<SignalEvents.ConnectionStatusChanged>(OnSignalConnectionStatusChanged, this);
         }
-        private void OnGrpcConnectionStatusChanged(GrpcEvents.ConnectionStatusChanged evt)
+        private void OnSignalConnectionStatusChanged(SignalEvents.ConnectionStatusChanged evt)
         {
-            if (evt.Status == GrpcConnectionStatus.Connected)
+            if (evt.Status == SignalConnectionStatus.Connected)
             {
-                grpcConnectButton.Text = "Disconnect";
+                serverConnectButton.Text = "Disconnect";
+                serverConnectButton.Enabled = true;
+                serverConnectionStatusIcon.Image = Properties.Resources.Connection_ok;
+            }
+            else if( evt.Status == SignalConnectionStatus.Connecting)
+            {
+                serverConnectButton.Text = "Connecting...";
+                serverConnectButton.Enabled = false;
+                serverConnectionStatusIcon.Image = Properties.Resources.Connection_error;
             }
             else
             {
-                grpcConnectButton.Text = "Connect";
+                serverConnectButton.Text = "Connect";
+                serverConnectButton.Enabled = true;
+                serverConnectionStatusIcon.Image = Properties.Resources.Connection_error;
             }
         }
 
@@ -66,9 +76,9 @@ namespace CommandCenter
             MessageBox.Show(reply.Message);
         }
 
-        private void grpcConnectButton_Click(object sender, EventArgs e)
+        private void serverConnectButton_Click(object sender, EventArgs e)
         {
-            var url = grpcUrlTextBox.Text;
+            var url = serverUrlTextBox.Text;
             //var grpcClient = _appController.ServiceProvider.GetRequiredService<GrpcClient>();
             //grpcClient.StartAsync(url);
             var signalClient = _appController.ServiceProvider.GetService<SignalClient>();

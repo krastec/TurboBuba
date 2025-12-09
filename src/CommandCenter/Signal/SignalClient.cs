@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
+﻿using CommandCenter.Infrastructure;
+using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,13 +16,20 @@ namespace CommandCenter.Signal
     //   await client.StopAsync();
     public class SignalClient : IAsyncDisposable
     {
+        private AppController _appController;
+
         private HubConnection? _hub;
         private readonly object _sync = new();
 
-        public event Action<HubConnectionState>? ConnectionStateChanged;
-        public event Action<ServerStatus>? OnMarketUpdate;
+        //public event Action<HubConnectionState>? ConnectionStateChanged;
+        //public event Action<ServerStatus>? OnMarketUpdate;
 
         public HubConnectionState State => _hub?.State ?? HubConnectionState.Disconnected;
+
+        public SignalClient(AppController appController)
+        {
+            _appController = appController;
+        }
 
         // Create and start connection. Safe to call multiple times (won't recreate if already started).
         public async Task StartAsync(string url, CancellationToken cancellationToken = default)
@@ -37,6 +45,7 @@ namespace CommandCenter.Signal
                 .WithAutomaticReconnect()
                 .Build();
 
+            /*
             // Forward server messages
             hub.On<ServerStatus>("OnMarketUpdate", update =>
             {
@@ -49,47 +58,49 @@ namespace CommandCenter.Signal
                     Console.WriteLine($"OnMarketUpdate handler error: {ex}");
                 }
             });
+            */
 
             // Track lifecycle events
             hub.Reconnecting += ex =>
             {
-                ConnectionStateChanged?.Invoke(HubConnectionState.Reconnecting);
+                PublishConnectionStatus(SignalConnectionStatus.Connecting);
+                //ConnectionStateChanged?.Invoke(HubConnectionState.Reconnecting);
                 Console.WriteLine($"SignalClient: Reconnecting... {ex?.Message}");
                 return Task.CompletedTask;
             };
 
             hub.Reconnected += connectionId =>
             {
-                ConnectionStateChanged?.Invoke(HubConnectionState.Connected);
+                PublishConnectionStatus(SignalConnectionStatus.Connected);
                 Console.WriteLine($"SignalClient: Reconnected (id={connectionId}).");
                 return Task.CompletedTask;
             };
 
             hub.Closed += ex =>
             {
-                ConnectionStateChanged?.Invoke(HubConnectionState.Disconnected);
+                PublishConnectionStatus(SignalConnectionStatus.Disconnected);
                 Console.WriteLine($"SignalClient: Closed. {ex?.Message}");
                 return Task.CompletedTask;
             };
 
-            lock (_sync)
-            {
-                _hub = hub;
-            }
-
             try
             {
-                ConnectionStateChanged?.Invoke(_hub.State);
-                await _hub.StartAsync(cancellationToken).ConfigureAwait(false);
-                ConnectionStateChanged?.Invoke(_hub.State);
+                PublishConnectionStatus(SignalConnectionStatus.Connecting);
+                await hub.StartAsync(cancellationToken).ConfigureAwait(false);
+                lock (_sync)
+                {
+                    _hub = hub;
+                }
+                PublishConnectionStatus(SignalConnectionStatus.Connected);
                 Console.WriteLine("SignalClient: Connected.");
             }
             catch (OperationCanceledException) { throw; }
             catch (Exception ex)
             {
-                ConnectionStateChanged?.Invoke(HubConnectionState.Disconnected);
+                PublishConnectionStatus(SignalConnectionStatus.Disconnected);
                 Console.WriteLine($"SignalClient: Start failed: {ex}");
-                // Keep _hub instance so caller can attempt restart/Stop/Dispose.
+                // Ensure the failed hub is cleaned up so caller can retry.
+                try { await hub.DisposeAsync().ConfigureAwait(false); } catch { }
                 throw;
             }
         }
@@ -118,10 +129,11 @@ namespace CommandCenter.Signal
             finally
             {
                 try { await hub.DisposeAsync().ConfigureAwait(false); } catch { }
-                ConnectionStateChanged?.Invoke(HubConnectionState.Disconnected);
+                PublishConnectionStatus(SignalConnectionStatus.Disconnected);
             }
         }
 
+        /*
         // Wait until connected or timeout. Returns true if connected.
         public async Task<bool> WaitForConnectedAsync(TimeSpan timeout)
         {
@@ -152,6 +164,12 @@ namespace CommandCenter.Signal
             {
                 ConnectionStateChanged -= Handler;
             }
+        }
+        */
+
+        private void PublishConnectionStatus(SignalConnectionStatus status)
+        {
+            _appController.EventBus.Publish<SignalEvents.ConnectionStatusChanged>(new SignalEvents.ConnectionStatusChanged(status, null));
         }
 
         // Convenience: current connection id (null if not connected)
