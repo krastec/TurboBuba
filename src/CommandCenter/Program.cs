@@ -29,8 +29,8 @@ namespace CommandCenter
 
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
-            var signalClient = serviceProvider.GetService<SignalClient>();
-            signalClient.StartAsync();
+            //var signalClient = serviceProvider.GetService<SignalClient>();
+            //signalClient.RunAsync();
 
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.

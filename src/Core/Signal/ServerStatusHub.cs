@@ -11,6 +11,7 @@ namespace TurboBuba.Signal
         public async Task BroadcastUpdate(ServerStatus update)
         {
             await Clients.All.SendAsync("OnMarketUpdate", update);
+            
         }
     }
 }

@@ -1,9 +1,11 @@
 using CommandCenter.Events;
 using CommandCenter.Grpc;
 using CommandCenter.Infrastructure;
+using CommandCenter.Signal;
 using Grpc.Net.Client;
 using Microsoft.Extensions.DependencyInjection;
 using PingPong;
+using System;
 
 
 
@@ -67,8 +69,10 @@ namespace CommandCenter
         private void grpcConnectButton_Click(object sender, EventArgs e)
         {
             var url = grpcUrlTextBox.Text;
-            var grpcClient = _appController.ServiceProvider.GetRequiredService<GrpcClient>();
-            grpcClient.StartAsync(url);
+            //var grpcClient = _appController.ServiceProvider.GetRequiredService<GrpcClient>();
+            //grpcClient.StartAsync(url);
+            var signalClient = _appController.ServiceProvider.GetService<SignalClient>();
+            signalClient.StartAsync(url);
         }
     }
 }
