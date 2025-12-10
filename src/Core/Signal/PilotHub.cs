@@ -29,7 +29,13 @@ namespace TurboBuba.Signal
 
         public async Task BroadcastExchangeStatus(SignalModels.ExchangeStatus exchangeStatus)
         {
-            await Clients.Group(exchangeStatus.Exchange).SendAsync("OnExchangeStatusChanged", exchangeStatus);
+            //await Clients.Group(exchangeStatus.Exchange).SendAsync("OnExchangeStatusChanged", exchangeStatus);
+            await Clients.All.SendAsync("OnExchangeStatusChanged", exchangeStatus);
+        }
+
+        public async Task Broadcast<T>(string method, T message)
+        {
+            await Clients.All.SendAsync(method, message);
         }
         // бот вызывает
         /*

@@ -38,7 +38,14 @@ namespace TurboBuba.Signal
         }
         private void OnExchangeConnectionStatusChanged(ExchangeEvents.ConnectionStatusChanged evt)
         {
+            SignalModels.ExchangeStatus exchangeStatus = new SignalModels.ExchangeStatus(
+                Exchange: evt.Exchange.ExchangeId,
+                Connected: evt.Status == ExchangeConnectionStatus.Connected ? 1 : 0,
+                Ping_in: 0,
+                Ping_out: 0
+            );
 
+            _hub.Broadcast<SignalModels.ExchangeStatus>(SignalModels.Methods.ExchangeStatusChanged, exchangeStatus);
         }
 
         public void Dispose()

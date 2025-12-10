@@ -24,6 +24,7 @@ namespace TurboBuba.Exchanges
         protected MarketDataManager _marketDataManager = new();
 
         public bool IsConnected { get; protected set; } = false;
+        public int ExchangeId => (int)_exchange;
 
         public BaseExchangeController(ExchangesList exchange)
         {
