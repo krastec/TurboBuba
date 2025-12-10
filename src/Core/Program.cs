@@ -23,7 +23,7 @@ namespace TurboBuba
                 .AddSingleton<EventBus>()
                 .AddSingleton<MainWindow>()
                 .AddSingleton<AppController>()
-
+                .AddSingleton<BinanceController>()
                 .AddSingleton<SignalServer>()
                 //ui
                 //.AddTransient<ExchangeStatusItem>()
@@ -35,11 +35,11 @@ namespace TurboBuba
             Task.Run(async () =>
             {
                 await Task.Delay(1000); // Simulate some startup delay
-                var binanceController = new BinanceController();
-                await binanceController.Connect();
+                var binanceController = serviceProvider.GetService<BinanceController>();
+                binanceController.Connect();
 
-                binanceController.RegisterContract("BTCUSDT", ContractType.Perp, 100, 1000, 1);
-                binanceController.SubscribeOrderBook("BTCUSDT", 10, null);
+                //binanceController.RegisterContract("BTCUSDT", ContractType.Perp, 100, 1000, 1);
+                //binanceController.SubscribeOrderBook("BTCUSDT", 10, null);
 
             });
 

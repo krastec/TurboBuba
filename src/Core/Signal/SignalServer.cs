@@ -12,8 +12,7 @@ namespace TurboBuba.Signal
             var builder = WebApplication.CreateBuilder();
             builder.WebHost.UseUrls("http://localhost:5000");//, "https://localhost:5001");
             builder.Services.AddSignalR();
-
-
+            
             var app = builder.Build();
 
             app.MapHub<PilotHub>("/pilot");

@@ -2,11 +2,20 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using TurboBuba.Infrastructure;
+using TurboBuba.UI;
 
 namespace TurboBuba.Signal
 {
     public class PilotHub : Hub
     {
+        private PilotEventsRouter _eventsRouter;
+
+        public PilotHub()
+        {
+            _eventsRouter = new PilotEventsRouter(AppController.Instance, this);
+            _eventsRouter.Start();
+        }
 
         public async Task Subscribe(string topic)
         {
@@ -18,6 +27,10 @@ namespace TurboBuba.Signal
             Groups.RemoveFromGroupAsync(Context.ConnectionId, topic);
         }
 
+        public async Task BroadcastExchangeStatus(SignalModels.ExchangeStatus exchangeStatus)
+        {
+            await Clients.Group(exchangeStatus.Exchange).SendAsync("OnExchangeStatusChanged", exchangeStatus);
+        }
         // бот вызывает
         /*
         public async Task BroadcastUpdate(ServerStatus topic)
