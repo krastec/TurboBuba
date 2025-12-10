@@ -7,9 +7,6 @@ using TurboBuba.UI;
 using TurboBuba.Events;
 using TurboBuba.Infrastructure;
 using TurboBuba.Exchanges;
-using Microsoft.AspNetCore.Builder;
-using TurboBuba.Grpc;
-using TurboBuba.Status.V1;
 using TurboBuba.Signal;
 
 
@@ -27,7 +24,6 @@ namespace TurboBuba
                 .AddSingleton<MainWindow>()
                 .AddSingleton<AppController>()
 
-                .AddSingleton<GrpcServer>()
                 .AddSingleton<SignalServer>()
                 //ui
                 //.AddTransient<ExchangeStatusItem>()

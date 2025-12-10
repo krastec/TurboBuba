@@ -9,8 +9,7 @@ namespace TurboBuba.Infrastructure
 
     public class AppController
     {
-        private static AppController _instance = null!;
-        public static AppController Instance { get { return _instance; } }
+        public static AppController Instance { get; private set; }
 
         private EventBus _eventBus = null!;
         public EventBus EventBus { get { return _eventBus; } }
@@ -23,7 +22,7 @@ namespace TurboBuba.Infrastructure
             _eventBus = eventBus;
             _serviceProvider = serviceProvider;
 
-            _instance = this;
+            Instance = this;
         }
 
 

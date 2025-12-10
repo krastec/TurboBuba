@@ -8,12 +8,13 @@ using System.Windows.Forms;
 
 namespace CommandCenter.StatusBar
 {
-    public partial class StatusBarExchangeStatus : UserControl
+    public partial class ExchangeStatusPanel : UserControl
     {
-        public StatusBarExchangeStatus()
+        public ExchangeStatusPanel()
         {
             InitializeComponent();
         }
+
 
         /*
         public string Title

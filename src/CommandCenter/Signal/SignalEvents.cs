@@ -1,8 +1,4 @@
 ﻿using CommandCenter.Events;
-using CommandCenter.Grpc;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CommandCenter.Signal
 {

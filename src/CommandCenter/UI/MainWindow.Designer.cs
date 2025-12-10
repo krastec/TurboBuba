@@ -1,4 +1,4 @@
-﻿using CommandCenter.UI.StatusBar;
+﻿
 
 namespace CommandCenter
 {
@@ -30,111 +30,80 @@ namespace CommandCenter
         /// </summary>
         private void InitializeComponent()
         {
-            button1 = new Button();
-            statusStrip1 = new StatusStrip();
-            statusBarExchangeStatusHost1 = new StatusBarExchangeStatusHost();
-            toolStrip1 = new ToolStrip();
-            serverConnectionStatusIcon = new ToolStripLabel();
-            serverUrlTextBox = new ToolStripTextBox();
-            serverConnectButton = new ToolStripButton();
-            toolStripSeparator1 = new ToolStripSeparator();
-            statusStrip1.SuspendLayout();
-            toolStrip1.SuspendLayout();
+            toolBarPanel = new Panel();
+            signalConnectionPanel = new CommandCenter.UI.ToolBar.SignalConnectionPanel();
+            statusBarPanel = new Panel();
+            exchangeStatusPanel1 = new CommandCenter.StatusBar.ExchangeStatusPanel();
+            orderBookPanel1 = new CommandCenter.UI.OrderBook.OrderBookPanel();
+            toolBarPanel.SuspendLayout();
+            statusBarPanel.SuspendLayout();
             SuspendLayout();
             // 
-            // button1
+            // toolBarPanel
             // 
-            button1.Location = new Point(234, 358);
-            button1.Name = "button1";
-            button1.Size = new Size(75, 23);
-            button1.TabIndex = 0;
-            button1.Text = "button1";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            toolBarPanel.BackColor = SystemColors.InactiveBorder;
+            toolBarPanel.Controls.Add(signalConnectionPanel);
+            toolBarPanel.Dock = DockStyle.Top;
+            toolBarPanel.Location = new Point(0, 0);
+            toolBarPanel.Name = "toolBarPanel";
+            toolBarPanel.Size = new Size(1317, 35);
+            toolBarPanel.TabIndex = 3;
             // 
-            // statusStrip1
+            // signalConnectionPanel
             // 
-            statusStrip1.BackColor = SystemColors.Control;
-            statusStrip1.Items.AddRange(new ToolStripItem[] { statusBarExchangeStatusHost1 });
-            statusStrip1.Location = new Point(0, 853);
-            statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(1317, 25);
-            statusStrip1.TabIndex = 1;
-            statusStrip1.Text = "statusStrip1";
+            signalConnectionPanel.Location = new Point(1, 3);
+            signalConnectionPanel.Name = "signalConnectionPanel";
+            signalConnectionPanel.Size = new Size(283, 29);
+            signalConnectionPanel.TabIndex = 0;
             // 
-            // statusBarExchangeStatusHost1
+            // statusBarPanel
             // 
-            statusBarExchangeStatusHost1.AutoSize = false;
-            statusBarExchangeStatusHost1.Margin = new Padding(0);
-            statusBarExchangeStatusHost1.Name = "statusBarExchangeStatusHost1";
-            statusBarExchangeStatusHost1.Size = new Size(150, 25);
-            statusBarExchangeStatusHost1.Text = "statusBarExchangeStatusHost1";
+            statusBarPanel.BackColor = SystemColors.InactiveBorder;
+            statusBarPanel.Controls.Add(exchangeStatusPanel1);
+            statusBarPanel.Dock = DockStyle.Bottom;
+            statusBarPanel.Location = new Point(0, 843);
+            statusBarPanel.Name = "statusBarPanel";
+            statusBarPanel.Size = new Size(1317, 35);
+            statusBarPanel.TabIndex = 4;
             // 
-            // toolStrip1
+            // exchangeStatusPanel1
             // 
-            toolStrip1.Items.AddRange(new ToolStripItem[] { serverConnectionStatusIcon, serverUrlTextBox, serverConnectButton, toolStripSeparator1 });
-            toolStrip1.Location = new Point(0, 0);
-            toolStrip1.Name = "toolStrip1";
-            toolStrip1.Size = new Size(1317, 25);
-            toolStrip1.TabIndex = 2;
-            toolStrip1.Text = "toolStrip1";
+            exchangeStatusPanel1.Location = new Point(1, 3);
+            exchangeStatusPanel1.Margin = new Padding(0);
+            exchangeStatusPanel1.Name = "exchangeStatusPanel1";
+            exchangeStatusPanel1.Padding = new Padding(2);
+            exchangeStatusPanel1.Size = new Size(110, 29);
+            exchangeStatusPanel1.TabIndex = 0;
             // 
-            // serverConnectionStatusIcon
+            // orderBookPanel1
             // 
-            serverConnectionStatusIcon.AutoSize = false;
-            serverConnectionStatusIcon.Image = Properties.Resources.Connection_error;
-            serverConnectionStatusIcon.Name = "serverConnectionStatusIcon";
-            serverConnectionStatusIcon.Size = new Size(22, 22);
-            // 
-            // serverUrlTextBox
-            // 
-            serverUrlTextBox.Name = "serverUrlTextBox";
-            serverUrlTextBox.Size = new Size(150, 25);
-            serverUrlTextBox.Text = "https://localhost:5001/pilot";
-            // 
-            // serverConnectButton
-            // 
-            serverConnectButton.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            serverConnectButton.ImageAlign = ContentAlignment.MiddleLeft;
-            serverConnectButton.ImageTransparentColor = Color.Magenta;
-            serverConnectButton.Name = "serverConnectButton";
-            serverConnectButton.Size = new Size(56, 22);
-            serverConnectButton.Text = "Connect";
-            serverConnectButton.TextImageRelation = TextImageRelation.ImageAboveText;
-            serverConnectButton.Click += serverConnectButton_Click;
-            // 
-            // toolStripSeparator1
-            // 
-            toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(6, 25);
+            orderBookPanel1.Location = new Point(385, 143);
+            orderBookPanel1.Name = "orderBookPanel1";
+            orderBookPanel1.Size = new Size(308, 596);
+            orderBookPanel1.TabIndex = 5;
             // 
             // MainWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1317, 878);
-            Controls.Add(toolStrip1);
-            Controls.Add(statusStrip1);
-            Controls.Add(button1);
+            Controls.Add(orderBookPanel1);
+            Controls.Add(statusBarPanel);
+            Controls.Add(toolBarPanel);
             Name = "MainWindow";
             Text = "Turbo Buba";
-            statusStrip1.ResumeLayout(false);
-            statusStrip1.PerformLayout();
-            toolStrip1.ResumeLayout(false);
-            toolStrip1.PerformLayout();
+            Load += MainWindow_Load;
+            toolBarPanel.ResumeLayout(false);
+            statusBarPanel.ResumeLayout(false);
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
-
-        private Button button1;
-        private StatusStrip statusStrip1;
-        private System.Windows.Forms.ToolStrip toolStrip1;
-        private ToolStripTextBox serverUrlTextBox;
-        private ToolStripButton serverConnectButton;
-        private ToolStripSeparator toolStripSeparator1;
-        private StatusBarExchangeStatusHost statusBarExchangeStatusHost1;
-        private ToolStripLabel serverConnectionStatusIcon;
+        private Panel toolBarPanel;
+        private UI.ToolBar.SignalConnectionPanel toolBarSignalPanel1;
+        private UI.ToolBar.SignalConnectionPanel signalConnectionPanel;
+        private Panel statusBarPanel;
+        private UI.OrderBook.OrderBookPanel orderBookPanel1;
+        private StatusBar.ExchangeStatusPanel exchangeStatusPanel1;
     }
 }

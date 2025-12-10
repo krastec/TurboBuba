@@ -1,5 +1,5 @@
 <Solution>
+  <Project Path="SignalModels/SignalModels.csproj" Id="fc9301d7-ece5-434e-b984-e1f74a6318a6" />
   <Project Path="src/CommandCenter/CommandCenter.csproj" Id="ce98021c-1afd-45e3-8aa2-98c3cb0ba468" />
   <Project Path="src/Core/TurboBuba.csproj" />
-  <Project Path="src/Protos/Protos.csproj" Id="31246884-f47a-4d36-976c-beae6c4d20b5" />
 </Solution>

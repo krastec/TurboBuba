@@ -19,10 +19,12 @@ namespace TurboBuba.Signal
         }
 
         // бот вызывает
-        public async Task BroadcastUpdate(ServerStatus update)
+        /*
+        public async Task BroadcastUpdate(ServerStatus topic)
         {
             //await Clients.Group(update.Symbol).SendAsync("OnMarketUpdate", update);
         }
+        */
 
 
         //разовые запрос - ответ

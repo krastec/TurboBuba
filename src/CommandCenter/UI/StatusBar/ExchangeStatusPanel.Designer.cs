@@ -1,6 +1,6 @@
 ﻿namespace CommandCenter.StatusBar
 {
-    partial class StatusBarExchangeStatus
+    partial class ExchangeStatusPanel
     {
         /// <summary> 
         /// Required designer variable.
@@ -39,7 +39,7 @@
             statusIcon.Image = Properties.Resources.Connection_error;
             statusIcon.Location = new Point(2, 2);
             statusIcon.Name = "statusIcon";
-            statusIcon.Size = new Size(24, 20);
+            statusIcon.Size = new Size(24, 25);
             statusIcon.SizeMode = PictureBoxSizeMode.Zoom;
             statusIcon.TabIndex = 0;
             statusIcon.TabStop = false;
@@ -49,21 +49,21 @@
             exchangeLabel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
             exchangeLabel.Location = new Point(28, 2);
             exchangeLabel.Name = "exchangeLabel";
-            exchangeLabel.Size = new Size(50, 20);
+            exchangeLabel.Size = new Size(50, 25);
             exchangeLabel.TabIndex = 1;
             exchangeLabel.Text = "Binance";
             exchangeLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // StatusBarExchangeStatus
+            // ExchangeStatusPanel
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             Controls.Add(exchangeLabel);
             Controls.Add(statusIcon);
             Margin = new Padding(0);
-            Name = "StatusBarExchangeStatus";
+            Name = "ExchangeStatusPanel";
             Padding = new Padding(2);
-            Size = new Size(141, 24);
+            Size = new Size(141, 29);
             ((System.ComponentModel.ISupportInitialize)statusIcon).EndInit();
             ResumeLayout(false);
         }

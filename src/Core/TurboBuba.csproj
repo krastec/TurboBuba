@@ -9,32 +9,20 @@
 
   <ItemGroup>
     <PackageReference Include="Binance.Net" Version="11.11.0" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="Serilog" Version="4.3.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageReference Include="Terminal.Gui" Version="2.0.0-develop.4713" />
-    <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
-    <PackageReference Include="Google.Protobuf" Version="3.33.2" />
-    <PackageReference Include="Grpc.Tools" Version="2.76.0">
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <!--<Protobuf Include="..\Protos\pingpong.proto" GrpcServices="Server" />-->
-    <Protobuf Include="..\Protos\*.proto" GrpcServices="Server" />
+   
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="CommandCenter\**" />
-    <Compile Remove="Logger\**" />
-    <Compile Remove="Strategies\**" />
-    <EmbeddedResource Remove="CommandCenter\**" />
-    <EmbeddedResource Remove="Logger\**" />
-    <EmbeddedResource Remove="Strategies\**" />
-    <None Remove="CommandCenter\**" />
-    <None Remove="Logger\**" />
-    <None Remove="Strategies\**" />
-  </ItemGroup>
+  
 
 </Project>

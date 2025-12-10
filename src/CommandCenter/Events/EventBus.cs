@@ -1,36 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace CommandCenter.Events
 {
     public class EventBus
     {
         private readonly Dictionary<Type, List<Subscription>> _subscribers = new();
+        private readonly object _sync = new();
 
         public Subscription Subscribe<TEvent>(Action<TEvent> handler, object subscriber, Func<TEvent, bool>? filter = null) where TEvent : IEvent
         {
             var type = typeof(TEvent);
-            if (!_subscribers.TryGetValue(type, out var subscriptions))
+            List<Subscription> subscriptions;
+            lock (_sync)
             {
-                subscriptions = new List<Subscription>();
-                _subscribers[type] = subscriptions;
+                if (!_subscribers.TryGetValue(type, out subscriptions))
+                {
+                    subscriptions = new List<Subscription>();
+                    _subscribers[type] = subscriptions;
+                }
             }
 
-            var subscription = new Subscription(type, handler, subscriber, filter != null ? e => filter((TEvent)e) : null);
-            subscriptions.Add(subscription);
+            // Capture the current SynchronizationContext (may be null).
+            var dispatchContext = SynchronizationContext.Current;
+
+            var subscription = new Subscription(type, handler, subscriber, filter != null ? e => filter((TEvent)e) : null, dispatchContext);
+
+            lock (_sync)
+            {
+                _subscribers[type].Add(subscription);
+            }
+
             return subscription;
         }
 
         public void Unsubscribe(Subscription subscription)
         {
-            if (_subscribers.TryGetValue(subscription.EventType, out var subscriptions))
+            lock (_sync)
             {
-                subscriptions.Remove(subscription);
-
-                if (subscriptions.Count == 0)
+                if (_subscribers.TryGetValue(subscription.EventType, out var subscriptions))
                 {
-                    _subscribers.Remove(subscription.EventType);
+                    subscriptions.Remove(subscription);
+
+                    if (subscriptions.Count == 0)
+                    {
+                        _subscribers.Remove(subscription.EventType);
+                    }
                 }
             }
         }
@@ -38,32 +55,95 @@ namespace CommandCenter.Events
         public void Publish<TEvent>(TEvent eventData) where TEvent : IEvent
         {
             var type = typeof(TEvent);
-            if (_subscribers.TryGetValue(type, out var subscriptions))
-            {
-                var deadSubscriptions = new List<Subscription>();
+            List<Subscription>? subscriptionsSnapshot = null;
 
-                foreach (var subscription in subscriptions)
+            lock (_sync)
+            {
+                if (_subscribers.TryGetValue(type, out var subscriptions))
                 {
-                    if (subscription.Handler is Action<TEvent> action)
+                    subscriptionsSnapshot = new List<Subscription>(subscriptions);
+                }
+            }
+
+            if (subscriptionsSnapshot == null)
+                return;
+
+            var deadSubscriptions = new List<Subscription>();
+
+            foreach (var subscription in subscriptionsSnapshot)
+            {
+                if (subscription.Handler is Action<TEvent> action)
+                {
+                    try
                     {
-                        // Проверяем фильтр
+                        // Check filter (filter uses object->bool wrapper)
                         if (subscription.Filter == null || subscription.Filter(eventData))
                         {
-                            action(eventData);
+                            if (subscription.DispatchContext != null)
+                            {
+                                // Post to captured context (non-blocking)
+                                try
+                                {
+                                    subscription.DispatchContext.Post(state =>
+                                    {
+                                        try
+                                        {
+                                            action((TEvent)state!);
+                                        }
+                                        catch
+                                        {
+                                            // swallow individual handler exceptions to protect other subscribers
+                                        }
+                                    }, eventData);
+                                }
+                                catch
+                                {
+                                    // If posting to context fails, fall back to direct call
+                                    try
+                                    {
+                                        action(eventData);
+                                    }
+                                    catch
+                                    {
+                                        // ignore
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // No context captured, call directly
+                                action(eventData);
+                            }
                         }
                     }
-                    else
+                    catch
                     {
+                        // If handler casting or filter throws, mark as dead to remove later
                         deadSubscriptions.Add(subscription);
                     }
                 }
-
-                foreach (var dead in deadSubscriptions)
+                else
                 {
-                    subscriptions.Remove(dead);
+                    deadSubscriptions.Add(subscription);
+                }
+            }
+
+            if (deadSubscriptions.Count > 0)
+            {
+                lock (_sync)
+                {
+                    if (_subscribers.TryGetValue(type, out var liveList))
+                    {
+                        foreach (var dead in deadSubscriptions)
+                        {
+                            liveList.Remove(dead);
+                        }
+
+                        if (liveList.Count == 0)
+                            _subscribers.Remove(type);
+                    }
                 }
             }
         }
     }
-
 }
